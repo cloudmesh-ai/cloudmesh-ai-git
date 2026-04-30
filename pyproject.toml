@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cloudmesh-ai-git"
+
+dynamic = ["version"]
+description = "Extension git created by CME"
+license = "Apache-2.0"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Development Status :: 4 - Beta",
+]
+dependencies = [
+    "cloudmesh-ai-cmc",
+    "click",
+    "rich",
+    "pytest",
+    "cloudmesh-ai-common",
+]
+[tool.setuptools.dynamic]
+version = {file = "VERSION"}
+
+[project.entry-points."cloudmesh.ai.command"]
+git = "command.git:register"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["command*"]
