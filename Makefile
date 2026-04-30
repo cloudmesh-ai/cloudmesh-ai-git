@@ -41,11 +41,11 @@ requirements:
 	pip-compile --output-file=requirements.txt pyproject.toml
 
 test:
-	pytest -v --html=.report.html tests/
+	PYTHONPATH=src pytest -v --html=.report.html tests/
 	open .report.html
 
 test-cov:
-	pytest --cov=cloudmesh.ai.command.speedtest --cov-report=term-missing tests/
+	PYTHONPATH=src pytest --cov=cloudmesh.ai.command.git --cov-report=term-missing tests/
 
 setup-test:
 	$(PIP) install pytest pytest-mock pytest-cov pytest-html

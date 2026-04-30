@@ -1,3 +1,5 @@
+assets/
+.report.html
 .python-version
 .aider*
 # Byte-compiled / optimized / DLL files

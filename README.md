@@ -5,9 +5,11 @@ The Cloudmesh AI Git extension provides a professional, curated interface for co
 ## Features
 
 - **Standard Operations**: Quick access to `status`, `log`, and `diff`.
+- **Workflow Automation**: Recursive `pull` for all repositories in a directory tree.
+- **Identity Management**: Manage multiple GitHub usernames and their associated repositories.
 - **History Maintenance**: Safe wrappers for destructive history rewriting.
-- **GitHub Integration**: Simplified synchronization with GitHub PRs and issues.
-- **Repository Management**: Streamlined merging of unrelated repositories.
+- **GitHub Integration**: Simplified synchronization and statistics retrieval via `gh`.
+- **Repository Management**: Streamlined merging and bulk backup of repositories.
 
 ## Installation
 
@@ -16,7 +18,7 @@ The Cloudmesh AI Git extension provides a professional, curated interface for co
 To use all features of this extension, ensure the following tools are installed on your system:
 
 1.  **Git**: The standard version control system.
-2.  **GitHub CLI (`gh`)**: Used for `sync-gh`.
+2.  **GitHub CLI (`gh`)**: Used for `sync-gh`, `stats-user`, `backup`, and `users`.
     - macOS: `brew install gh`
     - Linux/Windows: See [official docs](https://cli.github.com/).
 3.  **git-filter-repo**: Used for `nuke` and `clean-history`.
@@ -31,13 +33,37 @@ pip install -e .
 
 ## Command Reference
 
-### Basic Commands
+### Basic & Workflow Commands
 
 | Command | Description | Example |
 | :--- | :--- | :--- |
 | `cmc git status` | Show the working tree status | `cmc git status` |
 | `cmc git log` | Show recent commit logs | `cmc git log --count 10` |
 | `cmc git diff` | Show current changes | `cmc git diff` |
+| `cmc git pull` | Recursively pull all repos in current tree | `cmc git pull` |
+| `cmc git multi` | Run command in all sub-repos | `cmc git multi "pull origin main"` |
+| `cmc git stats` | Show contribution statistics (local) | `cmc git stats` |
+| `cmc git version-check` | Compare local vs PyPI/GH | `cmc git version-check cloudmesh-ai-common` |
+
+### User & Repository Management
+
+#### `cmc git user [add|remove] <username>`
+Manage your list of GitHub identities stored in `~/.config/cloudmesh/git/users.yaml`.
+- **List users**: `cmc git user`
+- **Add user**: `cmc git user add mygithubuser`
+- **Remove user**: `cmc git user remove mygithubuser`
+
+#### `cmc git stats-user <username|all>`
+Get basic statistics (repo count, stars, forks) for a specific user or all configured users.
+- **Example**: `cmc git stats-user all`
+
+#### `cmc git backup <username|all>`
+Clone all public repositories for the specified user (or all configured users) into `~/git_backups`.
+- **Example**: `cmc git backup mygithubuser`
+
+#### `cmc git summary`
+Generate a summary table of all configured GitHub users, their total repository count, and their most starred repository.
+- **Example**: `cmc git summary`
 
 ### Power-User Commands
 
@@ -78,3 +104,79 @@ Commands like `nuke` and `merge-repos` rewrite the Git commit history. This chan
 1.  **Backup**: Create a fresh clone of your repository.
 2.  **Coordinate**: Notify all team members that history is being rewritten.
 3.  **Force Push**: Be prepared to `git push --force` to your remote.
+
+## Full Command Documentation
+
+```text
+Cloudmesh AI Git Extension
+
+This extension provides a professional interface for common and advanced git operations,
+wrapping standard git, the GitHub CLI (gh), and git-filter-repo for history maintenance.
+
+Usage:
+    cmc git status
+    cmc git log [--count <number>]
+    cmc git diff
+    cmc git nuke <path>
+    cmc git clean-history
+    cmc git sync-gh
+    cmc git merge-repos <url>
+    cmc git multi <command>
+    cmc git stats
+    cmc git version-check <package_name>
+    cmc git pull
+    cmc git backup <user|all>
+    cmc git stats-user <username|all>
+    cmc git user [add <username> | remove <username>]
+    cmc git summary
+    cmc git -h | --help
+
+Commands:
+    status              Show the working tree status.
+    log                 Show commit logs.
+    diff                Show changes between commits, commit and working tree, etc.
+    nuke                Completely remove a path from the git history (destructive).
+    clean-history       Guided workflow to clean sensitive data or rewrite history.
+    sync-gh             Sync local state with GitHub using the gh CLI.
+    merge-repos         Merge another repository into the current one while preserving history.
+    multi               Execute a git command in all subdirectories that are git repositories.
+    stats               Show contribution statistics (lines of code per author) for the current repository.
+    version-check       Compare local version with PyPI and GitHub.
+    pull                Recursively pull all git repositories in the current tree.
+    backup              Clone repositories for a specific user or all configured users.
+    stats-user          Get basic statistics for a GitHub user or all configured users.
+    user                Manage configured GitHub usernames.
+    summary             Generate a summary table of all configured GitHub users and their top repositories.
+
+Arguments:
+    <path>             Path to the file or directory to remove from history.
+    <url>              URL of the remote repository to merge into the current one.
+    <command>          Git command to run across multiple repositories.
+    <package_name>     Name of the PyPI package to check version against.
+    <username>         GitHub username for stats or backup.
+    <user|all>         Specific username or 'all' to use configured users.
+
+Options:
+    --count <number>    Number of commits to show in the log [default: 5].
+    -h, --help          Show this help message and exit.
+
+Examples:
+    Check status:
+        $ cmc git status
+
+    Recursive pull in all sub-repos:
+        $ cmc git pull
+
+    Manage GitHub users:
+        $ cmc git user add mygithubuser
+        $ cmc git user
+
+    Get stats for all configured users:
+        $ cmc git stats-user all
+
+    Backup all repos for a user:
+        $ cmc git backup mygithubuser
+
+    Get a summary table of all configured users:
+        $ cmc git summary
+```
