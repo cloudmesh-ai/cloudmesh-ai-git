@@ -87,6 +87,12 @@ class GitViewServerHandler(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(response).encode("utf-8"))
 
 
+def get_panel_metadata():
+    """
+    Returns metadata for the AI Panel discovery.
+    """
+    return {"name": "Git View", "icon": "mdi-git"}
+
 class GitInfoView:
     """
     Handles the generation and display of the HTML view for Git repository statistics using Tabulator.
