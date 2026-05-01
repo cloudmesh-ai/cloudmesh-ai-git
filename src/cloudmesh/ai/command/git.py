@@ -66,11 +66,15 @@ Examples:
     Get stats for a user:
         $ cmc git info user mygithubuser
 
-    Get stats for an organization:
+    List all organizations or get stats for one:
+        $ cmc git info org
         $ cmc git info org cloudmesh
 
     Get stats for a repo:
         $ cmc git info repo myrepo --user mygithubuser
+
+    Open the browser view of all stats:
+        $ cmc git info view
 
     Backup all repos for a user:
         $ cmc git backup get mygithubuser
@@ -92,6 +96,7 @@ import requests
 import yaml
 import json
 import os
+import time
 import webbrowser
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -613,7 +618,7 @@ def fetch_all_repos_for_user(user, force, config, auth_user=None):
     Helper to fetch and enrich all repositories for a user, similar to stat_user_cmd.
     """
     excludes = config.get_excludes()
-    
+
     def is_excluded(repo_name):
         for pattern in excludes:
             if re.search(pattern, repo_name):
@@ -671,22 +676,48 @@ def fetch_all_repos_for_user(user, force, config, auth_user=None):
                         "created_at": r.get("createdAt"),
                     }
                 )
-        config.save_cached_repos(user, all_repos)
+        
+        # Merge with existing cache to avoid deleting enriched metadata
+        existing_cache = config.get_cached_repos(user) or []
+        cache_map = {r["repo"]: r for r in existing_cache if isinstance(r, dict) and "repo" in r}
+        
+        merged_repos = []
+        for repo in all_repos:
+            repo_name = repo["repo"]
+            if repo_name in cache_map:
+                # Keep the enriched version from cache
+                merged_repos.append(cache_map[repo_name])
+            else:
+                # Add the new basic repo info
+                merged_repos.append(repo)
+        
+        config.save_cached_repos(user, merged_repos)
+        all_repos = merged_repos
 
     if not all_repos:
         return []
 
+    # Phase 2: Incremental Enrichment
+    cached_data = config.get_cached_repos(user) or []
+    existing_metadata = {r["repo"]: r for r in cached_data if "size" in r or "pull_requests" in r}
+
     enriched_repos = []
-    with ThreadPoolExecutor(max_workers=5) as executor:
-        future_to_repo = {
-            executor.submit(fetch_repo_stats, user, repo): repo for repo in all_repos
-        }
-        for future in as_completed(future_to_repo):
-            repo_result = future.result()
-            if "error" not in repo_result:
-                cache_entry = repo_result.copy()
-                cache_entry.pop("_raw_data", None)
-                enriched_repos.append(cache_entry)
+    for repo in all_repos:
+        repo_name = repo["repo"]
+        
+        if repo_name in existing_metadata:
+            enriched_repos.append(existing_metadata[repo_name])
+            continue
+            
+        repo_result = fetch_repo_stats(user, repo)
+        if "error" not in repo_result:
+            cache_entry = repo_result.copy()
+            cache_entry.pop("_raw_data", None)
+            enriched_repos.append(cache_entry)
+        else:
+            enriched_repos.append(repo)
+            
+        time.sleep(0.1)
 
     config.save_cached_repos(user, enriched_repos)
     return enriched_repos
@@ -697,42 +728,78 @@ def fetch_all_repos_for_user(user, force, config, auth_user=None):
 
 def fetch_repo_stats(user, repo_data):
     """
-    Fetches detailed statistics for a single repository.
+    Fetches detailed statistics for a single repository using GraphQL to minimize API calls.
     """
-    repo_name = repo_data["repo"]
+    repo_full_name = repo_data["repo"]
     try:
-        repo_obj = gh.repo(repo_name)
-        data = repo_obj.get()
-
-        # Fetch detailed counts individually to avoid failing the whole repo if one stat is missing
+        # Split owner and repo name for GraphQL
+        if "/" not in repo_full_name:
+            return {"repo": repo_full_name, "error": "Invalid repo name format (expected owner/repo)"}
+        
+        owner, name = repo_full_name.split("/", 1)
+        repo_obj = gh.repo(repo_full_name)
+        
+        # Refined GraphQL query to avoid argument conflicts and missing required args
+        query = """
+        query($owner: String!, $name: String!) {
+          repository(owner: $owner, name: $name) {
+            stargazers { totalCount }
+            forks { totalCount }
+            pullRequests { totalCount }
+            defaultBranchRef {
+              target {
+                ... on Commit {
+                  history(first: 1) {
+                    nodes {
+                      committedDate
+                    }
+                  }
+                }
+              }
+            }
+            latestRelease {
+              tagName
+            }
+            issues(states: OPEN) {
+              totalCount
+            }
+          }
+        }
+        """
+        
+        # Execute GraphQL query with both owner and name
+        gql_res = repo_obj._run([
+            "api", "graphql", 
+            "-f", f"query={query}", 
+            "-f", f"owner={owner}", 
+            "-f", f"name={name}"
+        ])
+        
+        # Use REST call for size, default_branch, and ref counts (more stable than GraphQL for these)
+        rest_data = repo_obj.get()
+        
         details = {}
+        if gql_res and "data" in gql_res and gql_res["data"].get("repository"):
+            repo = gql_res["data"]["repository"]
+            details["pull_requests"] = repo.get("pullRequests", {}).get("totalCount", 0)
+            
+            # Extract last push date
+            db_ref = repo.get("defaultBranchRef")
+            if db_ref and db_ref.get("target"):
+                history = db_ref["target"].get("history")
+                if history and history.get("nodes"):
+                    details["last_push"] = history["nodes"][0].get("committedDate")
+            
+            details["release_version"] = (repo.get("latestRelease") or {}).get("tagName")
+            details["issues"] = repo.get("issues", {}).get("totalCount", 0) - details["pull_requests"]
 
-        def safe_fetch(func, key):
-            try:
-                return func()
-            except GitHubError:
-                return None
-
-        details["pull_requests"] = safe_fetch(
-            repo_obj.get_pull_requests_count, "pull_requests"
-        )
-        details["branches"] = safe_fetch(repo_obj.get_branches_count, "branches")
-        details["tags"] = safe_fetch(repo_obj.get_tags_count, "tags")
-        details["contributors"] = safe_fetch(
-            repo_obj.get_contributors_count, "contributors"
-        )
-        details["last_push"] = safe_fetch(repo_obj.get_latest_commit_date, "last_push")
-        details["release_version"] = safe_fetch(
-            repo_obj.get_latest_release, "release_version"
-        )
-        details["default_branch"] = data.get("default_branch") if data else "Unknown"
-
-        # Calculate issues (Total open - PRs)
-        if data:
-            total_open = data.get("open_issues_count", 0)
-            pr_count = details.get("pull_requests") or 0
-            details["issues"] = total_open - pr_count
-
+        # Enrich with REST data
+        if rest_data:
+            details["size"] = rest_data.get("size")
+            details["default_branch"] = rest_data.get("default_branch", "Unknown")
+            # Use REST for branch/tag counts if available or just leave as N/A
+            # Note: gh repo view or similar could provide these, but we'll stick to basic REST
+        
         # Only keep counts > 0
         filtered_details = {
             k: v for k, v in details.items() if v != 0 and v is not None
@@ -741,11 +808,11 @@ def fetch_repo_stats(user, repo_data):
         # Merge enriched data back into repo_data
         enriched_data = repo_data.copy()
         enriched_data.update(filtered_details)
-        enriched_data["_raw_data"] = data  # Keep raw data for stars/forks
+        enriched_data["_raw_data"] = rest_data if rest_data else {}
 
         return enriched_data
     except Exception as e:
-        return {"repo": repo_name, "error": str(e)}
+        return {"repo": repo_full_name, "error": str(e)}
 
 
 @info_group.command(name="user")
@@ -763,6 +830,13 @@ def stat_user_cmd(username, force):
     """
     if not check_dependency("gh", "Install via: brew install gh"):
         return
+
+    # Check authentication status to warn about rate limits
+    try:
+        gh.get_authenticated_user()
+    except GitHubError:
+        console.warning("You are not authenticated with 'gh'. You will be subject to much lower API rate limits (60/hr).")
+        console.print("To increase your limit, run: gh auth login")
 
     config = UserConfig()
     users_to_check = []
@@ -881,98 +955,81 @@ def stat_user_cmd(username, force):
                     "[cyan]Fetching stats...", total=len(all_repos)
                 )
 
-                enriched_repos = []
-                # Use ThreadPoolExecutor for parallel API calls
-                # Reduced max_workers to 5 to avoid GitHub API rate limiting which can cause hangs
-                with ThreadPoolExecutor(max_workers=5) as executor:
-                    future_to_repo = {
-                        executor.submit(fetch_repo_stats, user, repo): repo
-                        for repo in all_repos
+                # Use the helper function which now handles incremental enrichment and sequential processing
+                enriched_repos = fetch_all_repos_for_user(
+                    user, force=force, config=config, auth_user=gh.get_authenticated_user()
+                )
+
+                # Since fetch_all_repos_for_user does the work, we just print the results
+                # and update the progress bar.
+                for repo_result in enriched_repos:
+                    progress.update(task, advance=1)
+                    repo_name = repo_result["repo"]
+
+                    if "error" in repo_result:
+                        progress.console.print(
+                            f"- {repo_name}: Error fetching stats: {repo_result['error']}"
+                        )
+                        continue
+
+                    # Extract raw data for stars/forks (if available in the cached/fetched result)
+                    # Note: fetch_all_repos_for_user removes _raw_data before returning, 
+                    # so we rely on the enriched fields.
+                    
+                    filtered_details = {
+                        k: v
+                        for k, v in repo_result.items()
+                        if k
+                        not in [
+                            "repo",
+                            "url",
+                            "description",
+                            "website",
+                            "visibility",
+                            "date",
+                            "created_at",
+                        ]
                     }
 
-                    for future in as_completed(future_to_repo):
-                        # Update progress immediately as each task completes
-                        progress.update(task, advance=1)
-
-                        try:
-                            # Add a timeout to result() to prevent the main loop from hanging
-                            repo_result = future.result(timeout=35)
-                        except Exception as e:
-                            repo_result = {
-                                "repo": "Unknown",
-                                "error": f"Task timed out or failed: {e}",
-                            }
-                        repo_name = repo_result["repo"]
-
-                        if "error" in repo_result:
-                            progress.console.print(
-                                f"- {repo_name}: Error fetching stats: {repo_result['error']}"
-                            )
+                    # We can't get stargazers_count from filtered_details because it's in _raw_data
+                    # But we can use the enriched fields we have.
+                    stats_line = f"- {repo_name}:"
+                    
+                    if "branches" in filtered_details:
+                        stats_line += f", Branches: {filtered_details['branches']}"
+                    if "tags" in filtered_details:
+                        stats_line += f", Tags: {filtered_details['tags']}"
+                    if "issues" in filtered_details:
+                        stats_line += f", Issues: {filtered_details['issues']}"
+                    if "pull_requests" in filtered_details:
+                        stats_line += f", PRs: {filtered_details['pull_requests']}"
+                    if "contributors" in filtered_details:
+                        stats_line += f", Contributors: {filtered_details['contributors']}"
+                    if "release_version" in filtered_details:
+                        stats_line += f", Release: {filtered_details['release_version']}"
+                    if "size" in filtered_details:
+                        size_kb = filtered_details["size"]
+                        if size_kb > 1024 * 1024:
+                            size_str = f"{size_kb / (1024 * 1024):.2f} GB"
+                        elif size_kb > 1024:
+                            size_str = f"{size_kb / 1024:.2f} MB"
                         else:
-                            # Extract raw data for stars/forks
-                            data = repo_result.get("_raw_data", {})
-                            filtered_details = {
-                                k: v
-                                for k, v in repo_result.items()
-                                if k
-                                not in [
-                                    "repo",
-                                    "url",
-                                    "description",
-                                    "website",
-                                    "visibility",
-                                    "date",
-                                    "created_at",
-                                    "_raw_data",
-                                ]
-                            }
+                            size_str = f"{size_kb} KB"
+                        stats_line += f", Size: {size_str}"
 
-                            # Format the output line using the full owner/repo name
-                            stats_line = f"- {repo_name}: Stars: {data.get('stargazers_count') if data else 'N/A'}, Forks: {data.get('forks_count') if data else 'N/A'}"
-                            if "branches" in filtered_details:
-                                stats_line += (
-                                    f", Branches: {filtered_details['branches']}"
-                                )
-                            if "tags" in filtered_details:
-                                stats_line += f", Tags: {filtered_details['tags']}"
-                            if "issues" in filtered_details:
-                                stats_line += f", Issues: {filtered_details['issues']}"
-                            if "pull_requests" in filtered_details:
-                                stats_line += (
-                                    f", PRs: {filtered_details['pull_requests']}"
-                                )
-                            if "contributors" in filtered_details:
-                                stats_line += f", Contributors: {filtered_details['contributors']}"
-                            if "release_version" in filtered_details:
-                                stats_line += (
-                                    f", Release: {filtered_details['release_version']}"
-                                )
+                    # Add metadata
+                    meta = []
+                    if "last_push" in filtered_details:
+                        meta.append(f"Last Push: {filtered_details['last_push']}")
+                    if "created_at" in repo_result:
+                        meta.append(f"Created: {repo_result['created_at']}")
+                    if "default_branch" in filtered_details:
+                        meta.append(f"Default Branch: {filtered_details['default_branch']}")
 
-                            # Add metadata
-                            meta = []
-                            if "last_push" in filtered_details:
-                                meta.append(
-                                    f"Last Push: {filtered_details['last_push']}"
-                                )
-                            if "created_at" in repo_result:
-                                meta.append(f"Created: {repo_result['created_at']}")
-                            if "default_branch" in filtered_details:
-                                meta.append(
-                                    f"Default Branch: {filtered_details['default_branch']}"
-                                )
+                    if meta:
+                        stats_line += f" | {' | '.join(meta)}"
 
-                            if meta:
-                                stats_line += f" | {' | '.join(meta)}"
-
-                            progress.console.print(stats_line)
-
-                            # Remove raw data before caching
-                            cache_entry = repo_result.copy()
-                            cache_entry.pop("_raw_data", None)
-                            enriched_repos.append(cache_entry)
-
-                # Save the fully enriched list to cache
-                config.save_cached_repos(user, enriched_repos)
+                    progress.console.print(stats_line)
 
         except GitHubError as e:
             console.error(f"GitHub error for {user}: {e}")
@@ -982,15 +1039,31 @@ def stat_user_cmd(username, force):
 
 
 @info_group.command(name="org")
-@click.argument("org_name")
+@click.argument("org_name", required=False)
 def stat_org_cmd(org_name):
     """
-    Get basic statistics for a GitHub organization.
+    Get basic statistics for a GitHub organization or list all organizations.
 
     Usage:
-        cmc git stat org <org_name>
+        cmc git info org [org_name]
     """
     if not check_dependency("gh", "Install via: brew install gh"):
+        return
+
+    if not org_name:
+        # List all organizations the authenticated user belongs to
+        auth_user = gh.get_authenticated_user()
+        if not auth_user:
+            console.error("Could not determine authenticated GitHub user.")
+            return
+        
+        console.banner(f"Organizations for {auth_user}")
+        orgs = gh.user(auth_user).get_orgs()
+        if not orgs:
+            console.print("No organizations found.")
+        else:
+            for org in sorted(orgs):
+                console.print(f"- {org}")
         return
 
     console.banner(f"Stats for Organization: {org_name}")
@@ -1009,6 +1082,7 @@ def stat_org_cmd(org_name):
 
 
 from cloudmesh.ai.command.git_view import GitInfoView
+
 
 @info_group.command(name="view")
 def info_view_cmd():
@@ -1033,7 +1107,11 @@ def info_view_cmd():
         all_user_data[user] = repos or []
 
     # Use GitInfoView class to generate and open the HTML
-    view = GitInfoView(all_user_data, excludes=config.get_excludes())
+    view = GitInfoView(
+        all_user_data,
+        excludes=config.get_excludes(),
+        backup_dir=config.get_backup_dir(),
+    )
     view.open_in_browser()
     console.ok("Opening repository view in browser.")
 
@@ -1088,6 +1166,15 @@ def stat_repo_cmd(repo_name, user, org):
             console.print(f"Forks: {data.get('forks_count')}")
             console.print(f"Open Issues: {data.get('open_issues_count')}")
             console.print(f"Language: {data.get('language')}")
+            
+            size_kb = data.get("size", 0)
+            if size_kb > 1024 * 1024:
+                size_str = f"{size_kb / (1024 * 1024):.2f} GB"
+            elif size_kb > 1024:
+                size_str = f"{size_kb / 1024:.2f} MB"
+            else:
+                size_str = f"{size_kb} KB"
+            console.print(f"Size: {size_str}")
         else:
             console.warning("Could not retrieve repository data.")
 
