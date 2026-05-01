@@ -1,0 +1,6 @@
+cloudmesh:
+  ai:
+    app:
+      - name: Git View
+        image: mdi-git
+        position: main window in side navigation

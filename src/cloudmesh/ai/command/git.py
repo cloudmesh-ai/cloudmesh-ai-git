@@ -229,6 +229,39 @@ class UserConfig:
         config["backup_dir"] = str(Path(path).absolute())
         self.save_config(config)
 
+    def clone_repo(self, repo_full_name):
+        """
+        Clones a repository into the configured backup directory.
+        Returns (success, message).
+        """
+        try:
+            backup_dir = self.get_backup_dir()
+            backup_dir.mkdir(parents=True, exist_ok=True)
+            
+            repo_name = repo_full_name.split('/')[-1].replace('.git', '')
+            target_path = backup_dir / repo_name
+            
+            if target_path.exists():
+                # If it exists, try to pull instead of clone
+                result = subprocess.run(
+                    ["git", "-C", str(target_path), "pull"],
+                    capture_output=True, text=True, check=True
+                )
+                return True, f"Updated {repo_name} at {target_path}"
+            
+            # Clone the repo
+            url = f"https://github.com/{repo_full_name}.git"
+            subprocess.run(
+                ["git", "clone", url, str(target_path)],
+                capture_output=True, text=True, check=True
+            )
+            return True, f"Cloned {repo_name} to {target_path}"
+            
+        except subprocess.CalledProcessError as e:
+            return False, f"Git error: {e.stderr or e.stdout}"
+        except Exception as e:
+            return False, f"Unexpected error: {str(e)}"
+
 
 def check_dependency(tool_name, install_instructions):
     """

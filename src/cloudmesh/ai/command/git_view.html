@@ -6,7 +6,9 @@
     <title>Cloudmesh Git Info View</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator.min.css" rel="stylesheet">
+    <link href="git_table_styles.css" rel="stylesheet">
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+    <script src="git_table_config.js"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f6f8fa; color: #24292f; margin: 0; padding: 0; height: 100vh; box-sizing: border-box; overflow: hidden; }
         .container { width: 100%; height: 100vh; padding: 20px; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; }
@@ -28,26 +30,6 @@
         .modal-close { position: absolute; top: 16px; right: 16px; cursor: pointer; font-size: 20px; color: #57606a; }
         .modal-body p { margin: 8px 0; font-size: 14px; }
         .modal-body strong { color: #57606a; }
-    
-        /* Tabulator Customization */
-        .tabulator { border: 1px solid #d0d7de; border-radius: 6px; background: white; }
-        .tabulator-header { background-color: #f6f8fa !important; font-weight: 600 !important; }
-        .tabulator-row { background-color: white; }
-        .tabulator-row:hover { background-color: #fcfcfc !important; }
-        
-        .repo-link { color: #0969da; text-decoration: none; font-weight: 600; }
-        .repo-link:hover { text-decoration: underline; }
-        .stat-badge { display: inline-block; padding: 2px 6px; font-size: 11px; border-radius: 10px; background: #eff1f3; color: #57606a; border: 1px solid #d0d7de; margin-right: 5px; }
-        
-        .status-circle { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1px solid #d0d7de; }
-        .status-downloaded { background-color: #2da44e; border-color: #2da44e; }
-        .status-not-downloaded { background-color: #ffffff; border-color: #d0d7de; }
-        
-        .action-icons { display: flex; gap: 12px; font-size: 14px; justify-content: center; }
-        .action-icons i { cursor: pointer; color: #57606a; transition: color 0.2s; }
-        .action-icons i:hover { color: #0969da; }
-        .action-icons a { color: #57606a; text-decoration: none; transition: color 0.2s; }
-        .action-icons a:hover { color: #0969da; }
     </style>
 </head>
 <body>
@@ -82,90 +64,8 @@
         const data = {{DATA_JSON}};
         let table;
 
-        function formatSize(s) {
-            if (!s) return 'N/A';
-            if (s > 1024 * 1024) return (s / (1024 * 1024)).toFixed(2) + ' GB';
-            if (s > 1024) return (s / 1024).toFixed(2) + ' MB';
-            return s + ' KB';
-        }
-
-        function humanizeDate(dateStr) {
-            if (!dateStr) return 'N/A';
-            const date = new Date(dateStr.split(' ')[0]);
-            if (isNaN(date.getTime())) return dateStr;
-            
-            const now = new Date();
-            const diffInSeconds = Math.floor((now - date) / 1000);
-            
-            if (diffInSeconds < 60) return 'just now';
-            
-            const minutes = Math.floor(diffInSeconds / 60);
-            if (minutes < 60) return minutes + 'm ago';
-            
-            const hours = Math.floor(minutes / 60);
-            if (hours < 24) return hours + 'h ago';
-            
-            const days = Math.floor(hours / 24);
-            if (days < 30) return days + 'd ago';
-            
-            const months = Math.floor(days / 30);
-            if (months < 12) return months + 'mo ago';
-            
-            const years = Math.floor(days / 365);
-            return years + 'y ago';
-        }
-
         function render() {
-            table = new Tabulator("#git-table", {
-                data: data,
-                layout: "fitColumns",
-                height: "100%",
-                groupBy: "user",
-                groupHeader: function(value, count, data, group) {
-                    return `<span style="color: #0969da; font-weight: 600; font-size: 16px;">${value} (${count} repos)</span>`;
-                },
-                columns: [
-                    { title: "Status", field: "downloaded", width: 60, hozAlign: "center", formatter: function(cell) {
-                        const val = cell.getValue();
-                        return `<span class="status-circle ${val ? 'status-downloaded' : 'status-not-downloaded'}"></span>`;
-                    }},
-                    { title: "Org", field: "repo", width: 120, formatter: function(cell) {
-                        return cell.getValue().split('/')[0];
-                    }},
-                    { title: "Repo", field: "repo", width: 200, formatter: function(cell) {
-                        const full = cell.getValue();
-                        const name = full.split('/')[1];
-                        return `<a href="https://github.com/${full}" target="_blank" class="repo-link">${name}</a>`;
-                    }},
-                    { title: "Description", field: "description", formatter: function(cell) {
-                        return cell.getValue() || 'No description';
-                    }},
-                    { title: "PRs", field: "pull_requests", width: 80, hozAlign: "center" },
-                    { title: "Stats", field: "stats", width: 600, formatter: function(cell) {
-                        const repo = cell.getData();
-                        const stats = [];
-                        if (repo.branches) stats.push(`Branches: ${repo.branches}`);
-                        if (repo.tags) stats.push(`Tags: ${repo.tags}`);
-                        if (repo.issues) stats.push(`Issues: ${repo.issues}`);
-                        if (repo.contributors) stats.push(`Contribs: ${repo.contributors}`);
-                        if (repo.release_version) stats.push(`Rel: ${repo.release_version}`);
-                        return stats.map(s => `<span class="stat-badge">${s}</span>`).join('');
-                    }},
-                    { title: "Size", field: "size", width: 100, hozAlign: "right", formatter: (cell) => formatSize(cell.getValue()) },
-                    { title: "Last Updated", field: "last_push", width: 150, formatter: (cell) => humanizeDate(cell.getValue()) },
-                    { title: "Actions", field: "actions", width: 150, hozAlign: "center", formatter: function(cell) {
-                        const repo = cell.getData();
-                        return `
-                            <div class="action-icons">
-                                <i class="fa-solid fa-rotate" title="Refresh Repo" onclick="refreshRow(repo)"></i>
-                                <i class="fa-solid fa-download" title="Download"></i>
-                                <i class="fa-solid fa-upload" title="Upload"></i>
-                                <i class="fa-solid fa-circle-info" title="Info" onclick="showInfo(repo)"></i>
-                                <a href="https://github.com/${repo.repo}" target="_blank" title="Open Repo"><i class="fa-solid fa-globe"></i></a>
-                            </div>`;
-                    }},
-                ],
-            });
+            table = GitTableConfig.render("#git-table", data);
         }
 
         function filterRepos() {
