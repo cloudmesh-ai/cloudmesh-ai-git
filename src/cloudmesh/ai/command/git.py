@@ -103,14 +103,14 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from datetime import datetime
 
-from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress
-from cloudmesh.ai.common.io import console
+from cloudmesh.ai.common.io import console, load_yaml, dump_yaml, path_expand
+from cloudmesh.ai.common.logging_utils import get_contextual_logger
 from cloudmesh.ai.common.github import gh, GitHubError
 
-# Create a rich console for table formatting
-rich_console = Console()
+# Initialize Logger
+logger = get_contextual_logger("git")
 
 
 class UserConfig:
@@ -119,7 +119,7 @@ class UserConfig:
     """
 
     def __init__(self):
-        self.config_dir = Path.home() / ".config" / "cloudmesh" / "git"
+        self.config_dir = Path(path_expand("~/.config/cloudmesh/git"))
         self.config_file = self.config_dir / "config.yaml"
         self._ensure_config_exists()
 
@@ -131,7 +131,7 @@ class UserConfig:
                 {
                     "users": [],
                     "exclude": [],
-                    "backup_dir": str(Path.home() / "git_backups"),
+                    "backup_dir": path_expand("~/git_backups"),
                     "repo_cache": {},
                 }
             )
@@ -139,33 +139,31 @@ class UserConfig:
     def load_config(self):
         """Loads the configuration dictionary."""
         try:
-            with open(self.config_file, "r") as f:
-                data = yaml.safe_load(f)
-                if not isinstance(data, dict):
-                    return {
-                        "users": [],
-                        "exclude": [],
-                        "backup_dir": str(Path.home() / "git_backups"),
-                        "repo_cache": {},
-                    }
-                # Ensure repo_cache and exclude exist in loaded config
-                if "repo_cache" not in data:
-                    data["repo_cache"] = {}
-                if "exclude" not in data:
-                    data["exclude"] = []
-                return data
-        except (yaml.YAMLError, IOError):
+            data = load_yaml(str(self.config_file))
+            if not isinstance(data, dict):
+                return {
+                    "users": [],
+                    "exclude": [],
+                    "backup_dir": path_expand("~/git_backups"),
+                    "repo_cache": {},
+                }
+            # Ensure repo_cache and exclude exist in loaded config
+            if "repo_cache" not in data:
+                data["repo_cache"] = {}
+            if "exclude" not in data:
+                data["exclude"] = []
+            return data
+        except Exception:
             return {
                 "users": [],
                 "exclude": [],
-                "backup_dir": str(Path.home() / "git_backups"),
+                "backup_dir": path_expand("~/git_backups"),
                 "repo_cache": {},
             }
 
     def save_config(self, config):
         """Saves the configuration dictionary."""
-        with open(self.config_file, "w") as f:
-            yaml.dump(config, f, default_flow_style=False)
+        dump_yaml(config, str(self.config_file))
 
     def get_users(self):
         """Returns the list of configured usernames."""
@@ -221,12 +219,12 @@ class UserConfig:
 
     def get_backup_dir(self):
         """Returns the configured backup directory."""
-        return Path(self.load_config().get("backup_dir", Path.home() / "git_backups"))
+        return Path(self.load_config().get("backup_dir", path_expand("~/git_backups")))
 
     def set_backup_dir(self, path):
         """Sets the backup directory in the config."""
         config = self.load_config()
-        config["backup_dir"] = str(Path(path).absolute())
+        config["backup_dir"] = path_expand(path)
         self.save_config(config)
 
     def clone_repo(self, repo_full_name):
@@ -1423,7 +1421,7 @@ def summary_cmd():
         except subprocess.CalledProcessError:
             table.add_row(user, "Error", "Error")
 
-    rich_console.print(table)
+    console.print(table)
 
 
 # Add the groups to the main git group
