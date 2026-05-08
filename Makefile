@@ -13,7 +13,7 @@ GIT          := git
 PYENVVERSION := $(shell pyenv version-name)
 
 .PHONY: help install clean build test reinstall \
-        check tag release test test-cov setup-test uninstall-all \
+        check tag release test-html test-cov setup-test uninstall-all \
         tmp-setup
 
 help:
@@ -41,7 +41,10 @@ requirements:
 	pip-compile --output-file=requirements.txt pyproject.toml
 
 test:
-	PYTHONPATH=src pytest -v --html=.report.html tests/
+	PYTHONPATH=src $(PYTHON) -m pytest -v tests/
+
+test-html:
+	PYTHONPATH=src $(PYTHON) -m pytest -v --html=.report.html tests/
 	open .report.html
 
 test-cov:
