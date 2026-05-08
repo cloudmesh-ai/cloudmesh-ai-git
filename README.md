@@ -1,6 +1,6 @@
 # Cloudmesh AI Git Extension
 
-The Cloudmesh AI Git extension provides a professional, curated interface for common and advanced Git operations. It simplifies complex workflows by wrapping standard `git`, the GitHub CLI (`gh`), and `git-filter-repo` into a set of intuitive commands.
+The Cloudmesh AI Git extension provides a curated interface for common and advanced Git operations. It simplifies complex workflows by wrapping standard `git`, the GitHub CLI (`gh`), and `git-filter-repo` into a set of intuitive commands.
 
 ## Features
 
@@ -110,7 +110,7 @@ Commands like `nuke` and `merge-repos` rewrite the Git commit history. This chan
 ```text
 Cloudmesh AI Git Extension
 
-This extension provides a professional interface for common and advanced git operations,
+This extension provides an interface for common and advanced git operations,
 wrapping standard git, the GitHub CLI (gh), and git-filter-repo for history maintenance.
 
 Usage:
@@ -179,4 +179,3 @@ Examples:
 
     Get a summary table of all configured users:
         $ cmc git summary
-```
