@@ -7,7 +7,7 @@ name = "cloudmesh-ai-git"
 
 dynamic = ["version"]
 description = "Extension git created by CME"
-license = "Apache-2.0"
+license = {text = "Apache-2.0"}
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
