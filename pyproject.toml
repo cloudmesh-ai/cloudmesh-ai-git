@@ -7,11 +7,15 @@ name = "cloudmesh-ai-git"
 
 dynamic = ["version"]
 description = "Extension git created by CME"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
+urls = { "Homepage" = "https://github.com/cloudmesh-ai/cloudmesh-ai-git" }
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
     "Development Status :: 4 - Beta",
+    "Intended Audience :: System Administrators",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
 ]
 dependencies = [
     "cloudmesh-ai-cmc",
