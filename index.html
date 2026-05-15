@@ -10,6 +10,8 @@
       
       
       
+        <link rel="next" href="user.html">
+      
       
         
       
@@ -80,7 +82,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="Cloudmesh AI Git" class="md-header__button md-logo" aria-label="Cloudmesh AI Git" data-md-component="logo">
+    <a href="index.html" title="Cloudmesh AI Git" class="md-header__button md-logo" aria-label="Cloudmesh AI Git" data-md-component="logo">
       
   <img src="assets/logo-white.png" alt="logo">
 
@@ -99,7 +101,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Cloudmesh AI Git Extension
+              Home
             
           </span>
         </div>
@@ -177,7 +179,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="Cloudmesh AI Git" class="md-nav__button md-logo" aria-label="Cloudmesh AI Git" data-md-component="logo">
+    <a href="index.html" title="Cloudmesh AI Git" class="md-nav__button md-logo" aria-label="Cloudmesh AI Git" data-md-component="logo">
       
   <img src="assets/logo-white.png" alt="logo">
 
@@ -191,10 +193,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="README.md" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="index.html" class="md-nav__link md-nav__link--active">
         
   
   
@@ -210,6 +239,281 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#git-view-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git View Dashboard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-the-extension" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install the Extension
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#command-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Command Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Command Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-workflow-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic &amp; Workflow Commands
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#user-repository-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User &amp; Repository Management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="User &amp; Repository Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cmc-git-user-addremove-username" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cmc git user [add|remove] &lt;username&gt;
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cmc-git-stats-user-usernameall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cmc git stats-user &lt;username|all&gt;
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cmc-git-backup-usernameall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cmc git backup &lt;username|all&gt;
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cmc-git-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cmc git summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-user-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Power-User Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Power-User Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cmc-git-nuke-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cmc git nuke &lt;path&gt;
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cmc-git-clean-history" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cmc git clean-history
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cmc-git-sync-gh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cmc git sync-gh
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cmc-git-merge-repos-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cmc git merge-repos &lt;url&gt;
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transition-from-gitutil" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transition from gitutil
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#safety-warning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Safety Warning
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-command-documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Full Command Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Dependencies
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
