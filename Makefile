@@ -12,9 +12,7 @@ VERSION_FILE := VERSION
 GIT          := git
 PYENVVERSION := $(shell pyenv version-name)
 
-.PHONY: help install clean build test reinstall \ doc view
-        check tag release test-html test-cov setup-test uninstall-all \
-        tmp-setup doc view
+.PHONY: help install clean build test reinstall \ doc view check tag release test-html test-cov setup-test uninstall-all tmp-setup doc view
 
 help:
 	@echo
