@@ -1,5 +1,0 @@
-cloudmesh-ai-cmc
-click
-rich
-pytest
-cloudmesh-ai-common
