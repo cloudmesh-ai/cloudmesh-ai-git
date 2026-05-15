@@ -1,0 +1,10 @@
+README.md
+VERSION
+pyproject.toml
+src/cloudmesh_ai_git.egg-info/PKG-INFO
+src/cloudmesh_ai_git.egg-info/SOURCES.txt
+src/cloudmesh_ai_git.egg-info/dependency_links.txt
+src/cloudmesh_ai_git.egg-info/entry_points.txt
+src/cloudmesh_ai_git.egg-info/requires.txt
+src/cloudmesh_ai_git.egg-info/top_level.txt
+tests/test_git.py

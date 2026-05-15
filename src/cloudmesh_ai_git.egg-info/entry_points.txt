@@ -1,0 +1,5 @@
+[cloudmesh.ai.command]
+git = command.git:register
+
+[cloudmesh.ai.panel.app]
+git = cloudmesh.ai.command.git_view:get_panel_metadata
