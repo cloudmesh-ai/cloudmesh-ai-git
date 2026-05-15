@@ -12,7 +12,7 @@ VERSION_FILE := VERSION
 GIT          := git
 PYENVVERSION := $(shell pyenv version-name)
 
-.PHONY: help install clean build test reinstall \ doc
+.PHONY: help install clean build test reinstall \ doc view
         check tag release test-html test-cov setup-test uninstall-all \
         tmp-setup doc view
 
@@ -31,6 +31,7 @@ help:
 	@echo "  tag           - Create a git tag based on current version and push"
 	@echo "  release       - Full Production Cycle: upload + tag"
 	@echo "  doc           - Build documentation using mkdocs"
+	@echo "  view          - Preview documentation locally"
 	@echo "  view          - Start documentation server"
 	@echo
 
