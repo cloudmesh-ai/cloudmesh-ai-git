@@ -20,7 +20,7 @@ nav:
       - Telemetry: telemetry.md
       - Time: time.md
       - Aggregation: aggregation.md
-  - API Reference: API.md
+  - API Reference: api.md
 
 plugins:
   - search
