@@ -1,7 +1,7 @@
 # Cloudmesh AI Git Extension
 
-The Cloudmesh AI Git extension provides a curated interface for common and advanced Git operations. It simplifies complex workflows by wrapping standard `git`, the GitHub CLI (`gh`), and `git-filter-repo` into a set of intuitive commands.
-
+**Quick Links:**
+- [API Reference](API.md) - Full technical documentation of all modules.
 ## Features
 
 - **Standard Operations**: Quick access to `status`, `log`, and `diff`.
@@ -10,6 +10,21 @@ The Cloudmesh AI Git extension provides a curated interface for common and advan
 - **History Maintenance**: Safe wrappers for destructive history rewriting.
 - **GitHub Integration**: Simplified synchronization and statistics retrieval via `gh`.
 - **Repository Management**: Streamlined merging and bulk backup of repositories.
+- **Visual Git View**: An interactive HTML dashboard for monitoring repository statistics, managing backups, and quick-accessing GitHub repositories.
+
+## Git View Dashboard
+
+The extension includes a visual **Git View** dashboard that provides a curated table of all configured repositories. 
+
+**Key Dashboard Features:**
+- **Visual Status**: Quick indicators for local backup status.
+- **Action Icons**: 
+    - <i class="fa-solid fa-rotate"></i> **Refresh**: Update repository data from GitHub.
+    - <i class="fa-solid fa-download"></i> **Download**: Trigger repository backup.
+    - <i class="fa-solid fa-upload"></i> **Upload**: Sync local changes.
+    - <i class="fa-solid fa-circle-info"></i> **Info**: View detailed repository metadata.
+    - <i class="fa-solid fa-globe"></i> **WWW**: Open the repository directly on GitHub.
+- **Filtering**: Real-time search and exclusion filtering for large repository sets.
 
 ## Installation
 

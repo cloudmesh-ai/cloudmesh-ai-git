@@ -142,6 +142,15 @@
             }
         }
 
+        async function downloadRepo(repoName) {
+            alert(`Download triggered for ${repoName}. Please check the backend logs.`);
+            // In a full implementation, this would call a /download endpoint
+        }
+
+        async function uploadRepo(repoName) {
+            alert(`Upload triggered for ${repoName}. This feature is not yet implemented.`);
+        }
+
         function showInfo(repo) {
             const modal = document.getElementById('info-modal');
             const title = document.getElementById('modal-title');

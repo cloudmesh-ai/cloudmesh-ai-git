@@ -14,7 +14,7 @@ PYENVVERSION := $(shell pyenv version-name)
 
 .PHONY: help install clean build test reinstall \
         check tag release test-html test-cov setup-test uninstall-all \
-        tmp-setup
+        tmp-setup doc view
 
 help:
 	@echo
@@ -30,6 +30,8 @@ help:
 	@echo "  setup-test    - Install test deps"
 	@echo "  tag           - Create a git tag based on current version and push"
 	@echo "  release       - Full Production Cycle: upload + tag"
+	@echo "  doc           - Build documentation using mkdocs"
+	@echo "  view          - Start documentation server"
 	@echo
 
 # --- DEVELOPMENT & TESTING ---
@@ -75,6 +77,14 @@ tag:
 
 release: upload tag
 	@echo "Production release and tagging complete."
+
+# --- DOCUMENTATION ---
+
+doc:
+	mkdocs build
+
+view:
+	mkdocs serve
 
 # --- CLEANUP & REINSTALL ---
 

@@ -1,5 +1,5 @@
-add fa icons
-add an icon for download
-add an icon for upload
-add an icon for info
-add an icon for www that simply goes to a new panel and opens the repo
+- [x] add fa icons
+- [x] add an icon for download
+- [x] add an icon for upload
+- [x] add an icon for info
+- [x] add an icon for www that simply goes to a new panel and opens the repo
