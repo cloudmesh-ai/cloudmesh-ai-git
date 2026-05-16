@@ -99,6 +99,7 @@ import os
 import time
 import webbrowser
 import re
+import fnmatch
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from datetime import datetime
@@ -133,6 +134,7 @@ class UserConfig:
                     "exclude": [],
                     "backup_dir": path_expand("~/git_backups"),
                     "repo_cache": {},
+                    "issues_cache": {},
                 }
             )
 
@@ -146,10 +148,13 @@ class UserConfig:
                     "exclude": [],
                     "backup_dir": path_expand("~/git_backups"),
                     "repo_cache": {},
+                    "issues_cache": {},
                 }
-            # Ensure repo_cache and exclude exist in loaded config
+            # Ensure repo_cache, issues_cache and exclude exist in loaded config
             if "repo_cache" not in data:
                 data["repo_cache"] = {}
+            if "issues_cache" not in data:
+                data["issues_cache"] = {}
             if "exclude" not in data:
                 data["exclude"] = []
             return data
@@ -159,6 +164,7 @@ class UserConfig:
                 "exclude": [],
                 "backup_dir": path_expand("~/git_backups"),
                 "repo_cache": {},
+                "issues_cache": {},
             }
 
     def save_config(self, config):
@@ -226,6 +232,24 @@ class UserConfig:
         config = self.load_config()
         config["backup_dir"] = path_expand(path)
         self.save_config(config)
+
+    def save_cached_issues(self, org, issues):
+        """Saves the issues for an organization to the cache."""
+        config = self.load_config()
+        if "issues_cache" not in config:
+            config["issues_cache"] = {}
+        config["issues_cache"][org] = {
+            "timestamp": datetime.now().isoformat(),
+            "issues": issues,
+        }
+        self.save_config(config)
+
+    def get_cached_issues(self, org):
+        """Returns the cached issues for an organization."""
+        cache_data = self.load_config().get("issues_cache", {}).get(org)
+        if isinstance(cache_data, dict) and "issues" in cache_data:
+            return cache_data["issues"]
+        return None
 
     def clone_repo(self, repo_full_name):
         """
@@ -528,6 +552,76 @@ def clean_history_cmd():
     console.print("3. To remove a directory: use 'cmc git nuke <dir_path>'")
     console.warning("Note: Always backup your repository before rewriting history.")
 
+
+@git_group.group(name="action")
+def action_group():
+    """
+    GitHub Action management utilities.
+    """
+    pass
+
+@action_group.command(name="clean")
+@click.option(
+    "--strategy", 
+    default="keep-first-last", 
+    help="Cleanup strategy. Supported: keep-first-last"
+)
+def clean_action_cmd(strategy):
+    """
+    Clean up GitHub workflow runs for the current repository.
+    
+    Usage:
+        cmc git action clean --strategy=keep-first-last
+    """
+    if not check_dependency("gh", "Install via: brew install gh"):
+        return
+
+    try:
+        # Get current repo remote
+        result = subprocess.run(
+            ["git", "remote", "get-url", "origin"], 
+            capture_output=True, text=True, check=True
+        )
+        repo = result.stdout.strip()
+        
+        console.banner(f"Cleaning workflow runs for {repo}")
+        
+        if strategy == "keep-first-last":
+            # List runs (newest first)
+            runs_result = subprocess.run(
+                ["gh", "run", "list", "-L", "100", "-R", repo],
+                capture_output=True, text=True, check=True
+            )
+            
+            # Extract run IDs (last column)
+            run_ids = []
+            for line in runs_result.stdout.splitlines():
+                if line.strip():
+                    parts = line.split()
+                    if parts and parts[-1].isdigit():
+                        run_ids.append(parts[-1])
+            
+            if len(run_ids) <= 2:
+                console.print("Not enough runs to perform cleanup (2 or fewer found).")
+                return
+            
+            # Keep first (index -1) and last (index 0)
+            to_delete = run_ids[1:-1]
+            
+            console.print(f"Found {len(run_ids)} runs. Keeping first and last. Deleting {len(to_delete)} runs...")
+            
+            for rid in to_delete:
+                subprocess.run(["gh", "run", "delete", rid, "-R", repo], check=True)
+                console.print(f"Deleted run {rid}")
+            
+            console.ok("Cleanup complete.")
+        else:
+            console.error(f"Unsupported strategy: {strategy}")
+            
+    except subprocess.CalledProcessError as e:
+        console.error(f"Error during cleanup: {e.stderr or e.stdout}")
+    except Exception as e:
+        console.error(f"Unexpected error: {str(e)}")
 
 @git_group.command(name="sync-gh")
 def sync_gh_cmd():
@@ -1365,6 +1459,82 @@ def backup_info_cmd():
             except Exception as e:
                 console.print(f"  [yellow]![/yellow] {repo_name}: Error: {e}")
 
+
+@git_group.command(name="issues")
+@click.argument("org")
+@click.argument("pattern")
+@click.option("--refresh", is_flag=True, help="Force refresh of issues from GitHub.")
+def issues_cmd(org, pattern, refresh):
+    """
+    Collect all open issues from repositories in an organization matching a pattern.
+
+    Usage:
+        cmc git issues <org> <pattern>
+
+    Example:
+        $ cmc git issues cloudmesh.ai 'cloudmesh-ai-*'
+    """
+    if not check_dependency("gh", "Install via: brew install gh"):
+        return
+
+    try:
+        console.banner(f"Collecting issues from {org} matching {pattern}")
+        
+        config = UserConfig()
+        all_gh_issues = None
+
+        if not refresh:
+            all_gh_issues = config.get_cached_issues(org)
+            if all_gh_issues:
+                console.print(f"Using cached issues for {org}.")
+
+        if all_gh_issues is None:
+            console.print(f"Fetching open issues for {org}...")
+            # Fetch comprehensive data for better mining later
+            json_fields = "repository,number,title,state,labels,body,author,createdAt,updatedAt,closedAt,commentsCount,assignees,url"
+            issues_result = subprocess.run(
+                ["gh", "search", "issues", "--owner", org, "--state", "open", "--json", json_fields],
+                capture_output=True, text=True, check=True
+            )
+            all_gh_issues = json.loads(issues_result.stdout)
+            config.save_cached_issues(org, all_gh_issues)
+        
+        # 2. Filter issues by the repository pattern
+        all_issues = []
+        for issue in all_gh_issues:
+            repo_full_name = issue["repository"]["nameWithOwner"]
+            repo_name = repo_full_name.split("/")[-1]
+            if fnmatch.fnmatch(repo_name, pattern):
+                # Flatten the repository info for the table
+                issue["repo"] = repo_full_name
+                all_issues.append(issue)
+        
+        if not all_issues:
+            console.warning(f"No open issues found in {org} matching pattern {pattern}")
+            return
+
+        # 4. Display summary table
+        table = Table(title=f"Open Issues for {org} ({pattern})")
+        table.add_column("Repo", style="cyan")
+        table.add_column("ID", style="magenta")
+        table.add_column("Title", style="yellow")
+        table.add_column("Labels", style="green")
+
+        for issue in all_issues:
+            labels = ", ".join([l["name"] for l in issue.get("labels", [])])
+            table.add_row(
+                issue["repo"],
+                str(issue["number"]),
+                issue["title"],
+                labels
+            )
+
+        console.print(table)
+
+    except subprocess.CalledProcessError as e:
+        console.error(f"Error fetching issues: {e.stderr or e.stdout}")
+    except Exception as e:
+        console.error(f"Unexpected error: {str(e)}")
 
 @git_group.command(name="summary")
 def summary_cmd():
