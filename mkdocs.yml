@@ -8,23 +8,24 @@ nav:
 - API Reference: api.md
 
 plugins:
-- search
-- mkdocstrings:
-    handlers:
-      python:
-        options:
-          docstring_section_style: table
-          docstring_style: google
-          group_by_category: true
-          members: true
-          separate_signature: true
-          show_category_heading: true
-          show_root_full_path: true
-          show_source: true
-          show_submodules: true
-        paths:
-        - src
+  - cloudmesh-ai-theme
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_section_style: table
+            docstring_style: google
+            group_by_category: true
+            members: true
+            separate_signature: true
+            show_category_heading: true
+            show_root_full_path: true
+            show_source: true
+            show_submodules: true
+          paths:
+          - src
 site_name: Cloudmesh AI Git
 theme:
-  name: cloudmesh-ai-theme
+  name: material
 use_directory_urls: false
