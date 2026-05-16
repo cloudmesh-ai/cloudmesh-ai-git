@@ -16,7 +16,7 @@
         
       
       
-      <link rel="icon" href="assets/favicon.ico">
+      <link rel="icon" href="assets/theme/favicon.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
@@ -26,6 +26,9 @@
     
     
       <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -57,7 +60,14 @@
   </head>
   
   
-    <body dir="ltr">
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="#1e90ff" data-md-color-accent="#1e90ff">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -84,7 +94,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href="index.html" title="Cloudmesh AI Git" class="md-header__button md-logo" aria-label="Cloudmesh AI Git" data-md-component="logo">
       
-  <img src="assets/logo-white.png" alt="logo">
+  <img src="assets/theme/logo-white.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -107,6 +117,24 @@
         </div>
       </div>
     </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="#1e90ff" data-md-color-accent="#1e90ff"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="#1e90ff" data-md-color-accent="#1e90ff"  aria-hidden="true"  type="radio" name="__palette" id="__palette_1">
+    
+  
+</form>
+      
     
     
       <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
@@ -181,7 +209,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href="index.html" title="Cloudmesh AI Git" class="md-nav__button md-logo" aria-label="Cloudmesh AI Git" data-md-component="logo">
       
-  <img src="assets/logo-white.png" alt="logo">
+  <img src="assets/theme/logo-white.png" alt="logo">
 
     </a>
     Cloudmesh AI Git
@@ -1797,6 +1825,25 @@
 
 
 
+
+<style>
+.doc-object { 
+    border: 1px solid rgba(0, 0, 0, 0.2) !important; 
+    border-radius: 4px !important; 
+    padding: 0.5rem !important; 
+    margin: 0.5rem 0 !important; 
+    background-color: #ffffff !important;
+}
+
+.doc-object .doc-object {
+    background-color: transparent !important;
+}
+
+[data-md-color-scheme="slate"] .doc-object {
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+</style>
 <h1 id="cloudmesh-ai-git-api-reference">cloudmesh-ai-git API Reference</h1>
 <p>This page provides the API reference for the <code>cloudmesh-ai-git</code> library.</p>
 <h2 id="api-documentation">API Documentation</h2>
