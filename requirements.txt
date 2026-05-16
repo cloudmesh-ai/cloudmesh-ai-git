@@ -30,7 +30,7 @@ cloudmesh-ai-common==7.1.3
     # via
     #   cloudmesh-ai-cmc
     #   cloudmesh-ai-git (pyproject.toml)
-cloudmesh-ai-theme==7.0.1
+cloudmesh-ai-theme==7.0.3
     # via cloudmesh-ai-git (pyproject.toml)
 cryptography==48.0.0
     # via paramiko
