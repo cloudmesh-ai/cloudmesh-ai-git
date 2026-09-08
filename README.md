@@ -1,4 +1,4 @@
-# Cloudmesh AI Git Extension 🛠️
+# Cloudmesh AI Git Extension
 
 The Cloudmesh AI Git Extension provides a powerful interface for common and advanced Git operations, wrapping standard Git, the GitHub CLI (`gh`), and `git-filter-repo` for history maintenance. It enables recursive repository management, identity synchronization, and streamlined backup of GitHub repositories.
 
