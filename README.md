@@ -1,8 +1,10 @@
+# Cloudmesh AI Git Extension 🛠️
 
-# Cloudmesh AI Git Extension
+The Cloudmesh AI Git Extension provides a powerful interface for common and advanced Git operations, wrapping standard Git, the GitHub CLI (`gh`), and `git-filter-repo` for history maintenance. It enables recursive repository management, identity synchronization, and streamlined backup of GitHub repositories.
 
 **Quick Links:**
 - [API Reference](API.md) - Full technical documentation of all modules.
+
 ## Features
 
 - **Standard Operations**: Quick access to `status`, `log`, and `diff`.
@@ -90,26 +92,6 @@ Completely removes a file or directory from the entire Git history. This is a de
 
 #### `cmc git clean-history`
 Provides a guided workflow for cleaning sensitive data or rewriting history.
-- **Example**: `cmc git clean-history`
-
-#### `cmc git sync-gh`
-Synchronizes local state with GitHub using the `gh` CLI.
-- **Example**: `cmc git sync-gh`
-
-#### `cmc git merge-repos <url>`
-Merges another repository into the current one while preserving all history.
-- **Example**: `cmc git merge-repos https://github.com/user/other-repo.git`
-
-## Transition from `gitutil`
-
-This extension replaces the legacy `gitutil` bash scripts with modern, safer alternatives.
-
-| Legacy Script | New Command | Modern Tool Used |
-| :--- | :--- | :--- |
-| `gitNukePath` | `cmc git nuke` | `git-filter-repo` |
-| `gitRemoveFileFromHistory` | `cmc git nuke` | `git-filter-repo` |
-| `gitMergeRepos` | `cmc git merge-repos` | `git merge --allow-unrelated-histories` |
-| `change-authors` | `cmc git clean-history` | `git-filter-repo --mailmap` |
 
 ## Safety Warning
 
@@ -195,6 +177,8 @@ Examples:
 
     Get a summary table of all configured users:
         $ cmc git summary
+```
+
 ## Core Dependencies
 This project depends on the following core components of the Cloudmesh AI ecosystem:
 - [cloudmesh-ai-common](https://github.com/cloudmesh-ai/cloudmesh-ai-common)
