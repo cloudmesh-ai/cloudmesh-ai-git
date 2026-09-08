@@ -17,7 +17,7 @@
       
       
       <link rel="icon" href="assets/theme/favicon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -25,7 +25,7 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
@@ -462,28 +462,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#cmc-git-sync-gh" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cmc git sync-gh
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cmc-git-merge-repos-url" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cmc git merge-repos &lt;url&gt;
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -491,17 +469,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#transition-from-gitutil" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Transition from gitutil
-      
-    </span>
-  </a>
   
 </li>
       
@@ -860,28 +827,6 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#cmc-git-sync-gh" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cmc git sync-gh
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cmc-git-merge-repos-url" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        cmc git merge-repos &lt;url&gt;
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
@@ -889,17 +834,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#transition-from-gitutil" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Transition from gitutil
-      
-    </span>
-  </a>
   
 </li>
       
@@ -971,8 +905,26 @@
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
+/* Remove width restrictions to allow content to fill available space */
+:root {
+    --md-content-max-width: 100% !important;
+}
+
+.md-content__inner, 
+.md-main__inner,
+.md-grid {
+    max-width: none !important;
+    width: 100% !important;
+}
+
+/* Add breathing room between the middle column and sidebars */
+.md-content__inner {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+}
 </style>
 <h1 id="cloudmesh-ai-git-extension">Cloudmesh AI Git Extension</h1>
+<p>The Cloudmesh AI Git Extension provides a powerful interface for common and advanced Git operations, wrapping standard Git, the GitHub CLI (<code>gh</code>), and <code>git-filter-repo</code> for history maintenance. It enables recursive repository management, identity synchronization, and streamlined backup of GitHub repositories.</p>
 <p><strong>Quick Links:</strong>
 - <a href="API.md">API Reference</a> - Full technical documentation of all modules.</p>
 <h2 id="features">Features</h2>
@@ -1012,9 +964,9 @@
 </li>
 </ol>
 <h3 id="install-the-extension">Install the Extension</h3>
-<pre><code class="language-bash">cd cloudmesh-ai-git
-pip install -e .
-</code></pre>
+<div class="highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>cloudmesh-ai-git
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</span></code></pre></div>
 <h2 id="command-reference">Command Reference</h2>
 <h3 id="basic-workflow-commands">Basic &amp; Workflow Commands</h3>
 <table>
@@ -1084,47 +1036,7 @@ pip install -e .
 - <strong>Under the hood</strong>: Uses <code>git-filter-repo --path &lt;path&gt; --invert-paths</code>.
 - <strong>Example</strong>: <code>cmc git nuke config/secrets.json</code></p>
 <h4 id="cmc-git-clean-history"><code>cmc git clean-history</code></h4>
-<p>Provides a guided workflow for cleaning sensitive data or rewriting history.
-- <strong>Example</strong>: <code>cmc git clean-history</code></p>
-<h4 id="cmc-git-sync-gh"><code>cmc git sync-gh</code></h4>
-<p>Synchronizes local state with GitHub using the <code>gh</code> CLI.
-- <strong>Example</strong>: <code>cmc git sync-gh</code></p>
-<h4 id="cmc-git-merge-repos-url"><code>cmc git merge-repos &lt;url&gt;</code></h4>
-<p>Merges another repository into the current one while preserving all history.
-- <strong>Example</strong>: <code>cmc git merge-repos https://github.com/user/other-repo.git</code></p>
-<h2 id="transition-from-gitutil">Transition from <code>gitutil</code></h2>
-<p>This extension replaces the legacy <code>gitutil</code> bash scripts with modern, safer alternatives.</p>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">Legacy Script</th>
-<th style="text-align: left;">New Command</th>
-<th style="text-align: left;">Modern Tool Used</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;"><code>gitNukePath</code></td>
-<td style="text-align: left;"><code>cmc git nuke</code></td>
-<td style="text-align: left;"><code>git-filter-repo</code></td>
-</tr>
-<tr>
-<td style="text-align: left;"><code>gitRemoveFileFromHistory</code></td>
-<td style="text-align: left;"><code>cmc git nuke</code></td>
-<td style="text-align: left;"><code>git-filter-repo</code></td>
-</tr>
-<tr>
-<td style="text-align: left;"><code>gitMergeRepos</code></td>
-<td style="text-align: left;"><code>cmc git merge-repos</code></td>
-<td style="text-align: left;"><code>git merge --allow-unrelated-histories</code></td>
-</tr>
-<tr>
-<td style="text-align: left;"><code>change-authors</code></td>
-<td style="text-align: left;"><code>cmc git clean-history</code></td>
-<td style="text-align: left;"><code>git-filter-repo --mailmap</code></td>
-</tr>
-</tbody>
-</table>
+<p>Provides a guided workflow for cleaning sensitive data or rewriting history.</p>
 <h2 id="safety-warning">Safety Warning</h2>
 <p><strong>History Rewriting is Destructive.</strong>
 Commands like <code>nuke</code> and <code>merge-repos</code> rewrite the Git commit history. This changes commit hashes and can cause significant issues for other collaborators. </p>
@@ -1133,72 +1045,78 @@ Commands like <code>nuke</code> and <code>merge-repos</code> rewrite the Git com
 2.  <strong>Coordinate</strong>: Notify all team members that history is being rewritten.
 3.  <strong>Force Push</strong>: Be prepared to <code>git push --force</code> to your remote.</p>
 <h2 id="full-command-documentation">Full Command Documentation</h2>
-<p>```text
-Cloudmesh AI Git Extension</p>
-<p>This extension provides an interface for common and advanced git operations,
-wrapping standard git, the GitHub CLI (gh), and git-filter-repo for history maintenance.</p>
-<p>Usage:
-    cmc git status
-    cmc git log [--count <number>]
-    cmc git diff
-    cmc git nuke <path>
-    cmc git clean-history
-    cmc git sync-gh
-    cmc git merge-repos <url>
-    cmc git multi <command>
-    cmc git stats
-    cmc git version-check <package_name>
-    cmc git pull
-    cmc git backup <user|all>
-    cmc git stats-user <username|all>
-    cmc git user [add <username> | remove <username>]
-    cmc git summary
-    cmc git -h | --help</p>
-<p>Commands:
-    status              Show the working tree status.
-    log                 Show commit logs.
-    diff                Show changes between commits, commit and working tree, etc.
-    nuke                Completely remove a path from the git history (destructive).
-    clean-history       Guided workflow to clean sensitive data or rewrite history.
-    sync-gh             Sync local state with GitHub using the gh CLI.
-    merge-repos         Merge another repository into the current one while preserving history.
-    multi               Execute a git command in all subdirectories that are git repositories.
-    stats               Show contribution statistics (lines of code per author) for the current repository.
-    version-check       Compare local version with PyPI and GitHub.
-    pull                Recursively pull all git repositories in the current tree.
-    backup              Clone repositories for a specific user or all configured users.
-    stats-user          Get basic statistics for a GitHub user or all configured users.
-    user                Manage configured GitHub usernames.
-    summary             Generate a summary table of all configured GitHub users and their top repositories.</p>
-<p>Arguments:
-    <path>             Path to the file or directory to remove from history.
-    <url>              URL of the remote repository to merge into the current one.
-    <command>          Git command to run across multiple repositories.
-    <package_name>     Name of the PyPI package to check version against.
-    <username>         GitHub username for stats or backup.
-    <user|all>         Specific username or 'all' to use configured users.</p>
-<p>Options:
-    --count <number>    Number of commits to show in the log [default: 5].
-    -h, --help          Show this help message and exit.</p>
-<p>Examples:
-    Check status:
-        $ cmc git status</p>
-<pre><code>Recursive pull in all sub-repos:
-    $ cmc git pull
-
-Manage GitHub users:
-    $ cmc git user add mygithubuser
-    $ cmc git user
-
-Get stats for all configured users:
-    $ cmc git stats-user all
-
-Backup all repos for a user:
-    $ cmc git backup mygithubuser
-
-Get a summary table of all configured users:
-    $ cmc git summary
-</code></pre>
+<div class="highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Cloudmesh AI Git Extension
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>This extension provides an interface for common and advanced git operations,
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>wrapping standard git, the GitHub CLI (gh), and git-filter-repo for history maintenance.
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>Usage:
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    cmc git status
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    cmc git log [--count &lt;number&gt;]
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    cmc git diff
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    cmc git nuke &lt;path&gt;
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    cmc git clean-history
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    cmc git sync-gh
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    cmc git merge-repos &lt;url&gt;
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    cmc git multi &lt;command&gt;
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    cmc git stats
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    cmc git version-check &lt;package_name&gt;
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    cmc git pull
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    cmc git backup &lt;user|all&gt;
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    cmc git stats-user &lt;username|all&gt;
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    cmc git user [add &lt;username&gt; | remove &lt;username&gt;]
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>    cmc git summary
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>    cmc git -h | --help
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>Commands:
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>    status              Show the working tree status.
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>    log                 Show commit logs.
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>    diff                Show changes between commits, commit and working tree, etc.
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>    nuke                Completely remove a path from the git history (destructive).
+</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>    clean-history       Guided workflow to clean sensitive data or rewrite history.
+</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a>    sync-gh             Sync local state with GitHub using the gh CLI.
+</span><span id="__span-1-31"><a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a>    merge-repos         Merge another repository into the current one while preserving history.
+</span><span id="__span-1-32"><a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>    multi               Execute a git command in all subdirectories that are git repositories.
+</span><span id="__span-1-33"><a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a>    stats               Show contribution statistics (lines of code per author) for the current repository.
+</span><span id="__span-1-34"><a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>    version-check       Compare local version with PyPI and GitHub.
+</span><span id="__span-1-35"><a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>    pull                Recursively pull all git repositories in the current tree.
+</span><span id="__span-1-36"><a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>    backup              Clone repositories for a specific user or all configured users.
+</span><span id="__span-1-37"><a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>    stats-user          Get basic statistics for a GitHub user or all configured users.
+</span><span id="__span-1-38"><a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>    user                Manage configured GitHub usernames.
+</span><span id="__span-1-39"><a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a>    summary             Generate a summary table of all configured GitHub users and their top repositories.
+</span><span id="__span-1-40"><a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>
+</span><span id="__span-1-41"><a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>Arguments:
+</span><span id="__span-1-42"><a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>    &lt;path&gt;             Path to the file or directory to remove from history.
+</span><span id="__span-1-43"><a id="__codelineno-1-43" name="__codelineno-1-43" href="#__codelineno-1-43"></a>    &lt;url&gt;              URL of the remote repository to merge into the current one.
+</span><span id="__span-1-44"><a id="__codelineno-1-44" name="__codelineno-1-44" href="#__codelineno-1-44"></a>    &lt;command&gt;          Git command to run across multiple repositories.
+</span><span id="__span-1-45"><a id="__codelineno-1-45" name="__codelineno-1-45" href="#__codelineno-1-45"></a>    &lt;package_name&gt;     Name of the PyPI package to check version against.
+</span><span id="__span-1-46"><a id="__codelineno-1-46" name="__codelineno-1-46" href="#__codelineno-1-46"></a>    &lt;username&gt;         GitHub username for stats or backup.
+</span><span id="__span-1-47"><a id="__codelineno-1-47" name="__codelineno-1-47" href="#__codelineno-1-47"></a>    &lt;user|all&gt;         Specific username or &#39;all&#39; to use configured users.
+</span><span id="__span-1-48"><a id="__codelineno-1-48" name="__codelineno-1-48" href="#__codelineno-1-48"></a>
+</span><span id="__span-1-49"><a id="__codelineno-1-49" name="__codelineno-1-49" href="#__codelineno-1-49"></a>Options:
+</span><span id="__span-1-50"><a id="__codelineno-1-50" name="__codelineno-1-50" href="#__codelineno-1-50"></a>    --count &lt;number&gt;    Number of commits to show in the log [default: 5].
+</span><span id="__span-1-51"><a id="__codelineno-1-51" name="__codelineno-1-51" href="#__codelineno-1-51"></a>    -h, --help          Show this help message and exit.
+</span><span id="__span-1-52"><a id="__codelineno-1-52" name="__codelineno-1-52" href="#__codelineno-1-52"></a>
+</span><span id="__span-1-53"><a id="__codelineno-1-53" name="__codelineno-1-53" href="#__codelineno-1-53"></a>Examples:
+</span><span id="__span-1-54"><a id="__codelineno-1-54" name="__codelineno-1-54" href="#__codelineno-1-54"></a>    Check status:
+</span><span id="__span-1-55"><a id="__codelineno-1-55" name="__codelineno-1-55" href="#__codelineno-1-55"></a>        $ cmc git status
+</span><span id="__span-1-56"><a id="__codelineno-1-56" name="__codelineno-1-56" href="#__codelineno-1-56"></a>
+</span><span id="__span-1-57"><a id="__codelineno-1-57" name="__codelineno-1-57" href="#__codelineno-1-57"></a>    Recursive pull in all sub-repos:
+</span><span id="__span-1-58"><a id="__codelineno-1-58" name="__codelineno-1-58" href="#__codelineno-1-58"></a>        $ cmc git pull
+</span><span id="__span-1-59"><a id="__codelineno-1-59" name="__codelineno-1-59" href="#__codelineno-1-59"></a>
+</span><span id="__span-1-60"><a id="__codelineno-1-60" name="__codelineno-1-60" href="#__codelineno-1-60"></a>    Manage GitHub users:
+</span><span id="__span-1-61"><a id="__codelineno-1-61" name="__codelineno-1-61" href="#__codelineno-1-61"></a>        $ cmc git user add mygithubuser
+</span><span id="__span-1-62"><a id="__codelineno-1-62" name="__codelineno-1-62" href="#__codelineno-1-62"></a>        $ cmc git user
+</span><span id="__span-1-63"><a id="__codelineno-1-63" name="__codelineno-1-63" href="#__codelineno-1-63"></a>
+</span><span id="__span-1-64"><a id="__codelineno-1-64" name="__codelineno-1-64" href="#__codelineno-1-64"></a>    Get stats for all configured users:
+</span><span id="__span-1-65"><a id="__codelineno-1-65" name="__codelineno-1-65" href="#__codelineno-1-65"></a>        $ cmc git stats-user all
+</span><span id="__span-1-66"><a id="__codelineno-1-66" name="__codelineno-1-66" href="#__codelineno-1-66"></a>
+</span><span id="__span-1-67"><a id="__codelineno-1-67" name="__codelineno-1-67" href="#__codelineno-1-67"></a>    Backup all repos for a user:
+</span><span id="__span-1-68"><a id="__codelineno-1-68" name="__codelineno-1-68" href="#__codelineno-1-68"></a>        $ cmc git backup mygithubuser
+</span><span id="__span-1-69"><a id="__codelineno-1-69" name="__codelineno-1-69" href="#__codelineno-1-69"></a>
+</span><span id="__span-1-70"><a id="__codelineno-1-70" name="__codelineno-1-70" href="#__codelineno-1-70"></a>    Get a summary table of all configured users:
+</span><span id="__span-1-71"><a id="__codelineno-1-71" name="__codelineno-1-71" href="#__codelineno-1-71"></a>        $ cmc git summary
+</span></code></pre></div>
 <h2 id="core-dependencies">Core Dependencies</h2>
 <p>This project depends on the following core components of the Cloudmesh AI ecosystem:
 - <a href="https://github.com/cloudmesh-ai/cloudmesh-ai-common">cloudmesh-ai-common</a>
@@ -1252,10 +1170,10 @@ Get a summary table of all configured users:
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": [], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
